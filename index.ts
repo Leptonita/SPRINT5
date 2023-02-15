@@ -10,5 +10,12 @@ async function getJoke() {
         headers: myHeaders
     })
         .then(response => response.json())
-        .then(json => console.log(json));
+        .then(json => {
+            const divJoke: HTMLElement | null = document.querySelector("div .joke");
+            if (divJoke !== null) {
+                return divJoke.innerHTML = json.joke;
+            }
+
+            console.log()
+        });
 }
