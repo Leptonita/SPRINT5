@@ -8,6 +8,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+const moodBtnsContainer = document.getElementById("moodBtnsContainer");
+if (moodBtnsContainer != null) {
+    moodBtnsContainer.style.visibility = "hidden";
+}
+const reportJokes = [];
+const moodButtons = document.querySelectorAll('[data-score]');
+let previousJoke = "";
+let moodScoreButton = "";
 function getJoke() {
     return __awaiter(this, void 0, void 0, function* () {
         const myHeaders = new Headers({
@@ -20,11 +28,48 @@ function getJoke() {
         })
             .then(response => response.json())
             .then(json => {
+            if (moodBtnsContainer != null) {
+                moodBtnsContainer.style.visibility = "visible";
+            }
             const divJoke = document.querySelector("div .joke");
             if (divJoke !== null) {
+                let currentJoke = json.joke;
+                //let lastScoreJoke = moodScoreButton[moodScoreButton.length - 1];
+                let lastScoreJoke = moodScoreButton;
+                getMoodScore();
+                const d = new Date();
+                reportJokes.push({ joke: previousJoke, score: lastScoreJoke, date: d.toISOString() });
+                previousJoke = currentJoke;
+                console.log(reportJokes);
                 return divJoke.innerHTML = json.joke;
             }
-            console.log();
+            else {
+                return alert("sorry, something went wrong! No joke, no fun");
+            }
         });
     });
+}
+function getMoodScore() {
+    moodScoreButton = "";
+    moodButtons.forEach(button => button.addEventListener('click', () => {
+        const moodScore = button.getAttribute("data-score");
+        console.log(moodScore);
+        if (moodScore !== null && (moodScore === "1" || moodScore === "2" || moodScore === "3")) {
+            moodScoreButton = moodScore;
+        }
+        else {
+            moodScoreButton = "";
+        }
+    }));
+    /*
+    console.log("moodScoreButton", moodScoreButton);
+
+    
+                getMoodScore();
+                const d = new Date();
+
+                reportJokes.push({ joke: json.joke, score: moodScoreButton[moodScoreButton.length - 1], date: d.toISOString() });
+
+                console.log(reportJokes);
+    */
 }
