@@ -9,6 +9,15 @@ const theHeaders = {
     "cache-control": "no-cache"
 }
 
+function numberToString(num: number): string {
+    //convert a number to a string with 2 characters
+    let numString: string = num.toString();
+    if (num < 10 && num >= 0) {
+        numString = "0" + numString;
+    }
+    return numString;
+}
+
 async function getWeather(url: string) {
     await fetch(url, {
         method: 'GET',
@@ -26,34 +35,53 @@ async function getWeather(url: string) {
                 .then(json => {
                     console.log("json response", json);
 
-                    const todayPredictions = json[0].prediccion.dia[0];
-                    console.log("predicciones para hoy", todayPredictions);
-                    //estado del cielo por horas, dia[0] es hoy
-
-                    const skyTodayHoursArr = todayPredictions.estadoCielo;
-                    const temperatureTodayHoursArr = todayPredictions.temperatura;
-                    console.log(`Hoy, prediccion cada hora del dia:\n\n array estado del cielo  `, skyTodayHoursArr,
-                        "array temperatura: ", temperatureTodayHoursArr);
-
-                    // hour must be a string, have two digits and be higher than 0 (they don't provide any value for 00:00, so we will get the prevision for the next hour)
                     const toDay = new Date();
-                    let nowHour: string = toDay.getHours().toString();
-                    // nowHour = "1";
-                    if (nowHour === "0") {
-                        nowHour = "01";
-                    } else if (Number(nowHour) < 10) {
-                        nowHour = "0" + nowHour;
+                    // be carefull with toISOString because it returns UTC time that is one hour less 
+                    //console.log("Hoy es: ", toDay.toISOString().substring(0, 19)) is one hour less;
+
+                    // constructing the date with each element to become a string and to look like the ISO time without delays ::: 
+
+                    // The hour, month, ... must be a string and have two digits 
+                    let nowHour: string = numberToString(toDay.getHours());
+                    let nowMinutes: string = numberToString(toDay.getMinutes());
+
+                    //YYYY-MM-DD today (la fecha de hoy)
+                    const toDayString: string = `${numberToString(toDay.getFullYear())}-${numberToString(toDay.getMonth() + 1)}-${numberToString(toDay.getDate())}`;
+
+                    console.log("Hoy es: ", toDayString + "T" + nowHour + ":" + nowMinutes);
+
+                    /* AEMET provides previsions of 3 days (only 48hours in total).
+                    Around 5 or 6 hours before the current time and more info for the future. Therefore at midnight we can find previsions of the day before, today and tomorrow. So we must look for the data of the current time iterating  */
+                    interface DayPred {
+                        estadoCielo: string[],
+                        fecha: string,
+
+                        temperatura: string[],
+                        vientoAndRachaMax: string[]
                     }
+                    //[] ... day
+                    const todayPredictions = json[0].prediccion.dia.filter((day: DayPred) => {
+                        // filtering result by date YYYY-MM-DD
+                        return (day.fecha.substring(0, 10) === toDayString)
+                    });
 
-                    console.log("nowHour: ", nowHour);
+                    console.log("[] ... predicciones para hoy - todos los datos en array", todayPredictions);
 
+                    //[] ... Hours
+                    const skyTodayHoursArr = todayPredictions[0].estadoCielo;
+                    const temperatureTodayHoursArr = todayPredictions[0].temperatura;
+
+                    console.log(`[] ... prediccion por horas para:\n\n  [] ... estado del cielo`, skyTodayHoursArr,
+                        "\n  [] ... temperatura: ", temperatureTodayHoursArr);
+
+                    //[] ... now 
                     interface Sitem {
                         value: string,
                         periodo: string,
                         descripcion: string
                     }
                     const skyThisHourArr = skyTodayHoursArr.filter((sItem: Sitem) => {
-                        console.log(typeof sItem);
+                        //filtering by the current hour of 'estadoCielo' prediction 
                         return sItem.periodo === nowHour
                     });
 
@@ -62,15 +90,18 @@ async function getWeather(url: string) {
                         periodo: string
                     }
 
+                    //filtering by the current hour of "temperatura" prediction 
                     const tempThisHourArr = temperatureTodayHoursArr.filter((tItem: Titem) => tItem.periodo === nowHour);
 
-                    console.log(`datos para las ${nowHour} de hoy - Array: estado del Cielo - Temperatura`, skyThisHourArr, " - ", tempThisHourArr);
+                    console.log(`datos para las ${nowHour} de hoy: ${toDayString} - Array: estado del Cielo - Temperatura`, skyThisHourArr, " - ", tempThisHourArr);
 
+                    //now values of "estadoCielo" and "temperatura"
                     const skyDescriptionNow = skyThisHourArr[0].descripcion;
                     const temperatureNow = tempThisHourArr[0].value;
                     const messageWeather = `Hoy: cielo ${skyDescriptionNow.toLowerCase()} y ${temperatureNow} ºC`;
                     console.log(messageWeather);
 
+                    //show results on the HTML page
                     const meteoDiv = document.querySelector("#meteo");
                     (meteoDiv !== null) ? meteoDiv.innerHTML = messageWeather : "sin previsión";
                     //return messageWeather;
@@ -85,12 +116,12 @@ const dirApi = getWeather(urlMeteoApi);
 console.log("direction datos meteo AEMET, getWeather(urlMeteoApi)", dirApi);
 
 //
-//JOKES 
+//JOKES
 // by icanhazdadjoke.com/
+// by https://api.chucknorris.io
 
-
+//mood icons visible only when clicking the button to begin
 const moodBtnsContainer: HTMLElement | null = document.getElementById("moodBtnsContainer");
-
 if (moodBtnsContainer != null) {
     moodBtnsContainer.style.visibility = "hidden";
 }
@@ -104,20 +135,32 @@ let previousJoke: string = "";
 let moodScoreButton: string = "";
 
 
+
+
 async function getJoke() {
-    const urlDadJoke: string = "https://icanhazdadjoke.com/";
+
+    //random 0 or 1 - to choose the API source of the jokes
+    let sourceIdJoke: number = Math.round(Math.random());
+
+    let urlSource: string = "";
+    if (sourceIdJoke === 0) {
+        urlSource = "https://icanhazdadjoke.com/";
+    } else if (sourceIdJoke === 1) {
+        urlSource = "https://api.chucknorris.io/jokes/random";
+    }
+
     const myHeaders = new Headers({
         "Accept": "application/json",
         "User-Agent": "My Library (https://github.com/Leptonita/sprint5)"
     });
 
-    await fetch(urlDadJoke, {
+    await fetch(urlSource, {
         method: 'GET',
         headers: myHeaders
     })
         .then(response => response.json())
         .then(json => {
-
+            //show mood buttons
             if (moodBtnsContainer != null) {
                 moodBtnsContainer.style.visibility = "visible";
             }
@@ -126,8 +169,14 @@ async function getJoke() {
 
             if (divJoke !== null) {
 
-                let currentJoke: string = json.joke;
-                //let lastScoreJoke = moodScoreButton[moodScoreButton.length - 1];
+                let currentJoke: string = "";
+                if (sourceIdJoke === 0) {
+                    currentJoke = json.joke;
+
+                } else if (sourceIdJoke === 1) {
+                    currentJoke = json.value;
+                }
+
                 let lastScoreJoke = moodScoreButton;
 
                 getMoodScore();
@@ -136,8 +185,12 @@ async function getJoke() {
                 reportJokes.push({ joke: previousJoke, score: lastScoreJoke, date: d.toISOString() });
 
                 previousJoke = currentJoke;
+
+                //show reportJokes
                 console.log(reportJokes);
-                return divJoke.innerHTML = json.joke;
+                //show joke
+                return divJoke.innerHTML = currentJoke;
+
             } else {
                 return alert("sorry, something went wrong! No joke, no fun");
             }

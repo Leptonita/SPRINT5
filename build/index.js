@@ -15,6 +15,14 @@ const theHeaders = {
     "accept": "application/json",
     "cache-control": "no-cache"
 };
+function numberToString(num) {
+    //convert a number to a string with 2 characters
+    let numString = num.toString();
+    if (num < 10 && num >= 0) {
+        numString = "0" + numString;
+    }
+    return numString;
+}
 function getWeather(url) {
     return __awaiter(this, void 0, void 0, function* () {
         yield fetch(url, {
@@ -32,33 +40,39 @@ function getWeather(url) {
                 .then(response => response.json())
                 .then(json => {
                 console.log("json response", json);
-                const todayPredictions = json[0].prediccion.dia[0];
-                console.log("predicciones para hoy", todayPredictions);
-                //estado del cielo por horas, dia[0] es hoy
-                const skyTodayHoursArr = todayPredictions.estadoCielo;
-                const temperatureTodayHoursArr = todayPredictions.temperatura;
-                console.log(`Hoy, prediccion cada hora del dia:\n\n array estado del cielo  `, skyTodayHoursArr, "array temperatura: ", temperatureTodayHoursArr);
-                // hour must be a string, have two digits and be higher than 0 (they don't provide any value for 00:00, so we will get the prevision for the next hour)
                 const toDay = new Date();
-                let nowHour = toDay.getHours().toString();
-                // nowHour = "1";
-                if (nowHour === "0") {
-                    nowHour = "01";
-                }
-                else if (Number(nowHour) < 10) {
-                    nowHour = "0" + nowHour;
-                }
-                console.log("nowHour: ", nowHour);
+                // be carefull with toISOString because it returns UTC time that is one hour less 
+                //console.log("Hoy es: ", toDay.toISOString().substring(0, 19)) is one hour less;
+                // constructing the date with each element to become a string and to look like the ISO time without delays ::: 
+                // The hour, month, ... must be a string and have two digits 
+                let nowHour = numberToString(toDay.getHours());
+                let nowMinutes = numberToString(toDay.getMinutes());
+                //YYYY-MM-DD today (la fecha de hoy)
+                const toDayString = `${numberToString(toDay.getFullYear())}-${numberToString(toDay.getMonth() + 1)}-${numberToString(toDay.getDate())}`;
+                console.log("Hoy es: ", toDayString + "T" + nowHour + ":" + nowMinutes);
+                //[] ... day
+                const todayPredictions = json[0].prediccion.dia.filter((day) => {
+                    // filtering result by date YYYY-MM-DD
+                    return (day.fecha.substring(0, 10) === toDayString);
+                });
+                console.log("[] ... predicciones para hoy - todos los datos en array", todayPredictions);
+                //[] ... Hours
+                const skyTodayHoursArr = todayPredictions[0].estadoCielo;
+                const temperatureTodayHoursArr = todayPredictions[0].temperatura;
+                console.log(`[] ... prediccion por horas para:\n\n  [] ... estado del cielo`, skyTodayHoursArr, "\n  [] ... temperatura: ", temperatureTodayHoursArr);
                 const skyThisHourArr = skyTodayHoursArr.filter((sItem) => {
-                    console.log(typeof sItem);
+                    //filtering by the current hour of 'estadoCielo' prediction 
                     return sItem.periodo === nowHour;
                 });
+                //filtering by the current hour of "temperatura" prediction 
                 const tempThisHourArr = temperatureTodayHoursArr.filter((tItem) => tItem.periodo === nowHour);
-                console.log(`datos para las ${nowHour} de hoy - Array: estado del Cielo - Temperatura`, skyThisHourArr, " - ", tempThisHourArr);
+                console.log(`datos para las ${nowHour} de hoy: ${toDayString} - Array: estado del Cielo - Temperatura`, skyThisHourArr, " - ", tempThisHourArr);
+                //now values of "estadoCielo" and "temperatura"
                 const skyDescriptionNow = skyThisHourArr[0].descripcion;
                 const temperatureNow = tempThisHourArr[0].value;
                 const messageWeather = `Hoy: cielo ${skyDescriptionNow.toLowerCase()} y ${temperatureNow} ºC`;
                 console.log(messageWeather);
+                //show results on the HTML page
                 const meteoDiv = document.querySelector("#meteo");
                 (meteoDiv !== null) ? meteoDiv.innerHTML = messageWeather : "sin previsión";
                 //return messageWeather;
@@ -84,31 +98,47 @@ let previousJoke = "";
 let moodScoreButton = "";
 function getJoke() {
     return __awaiter(this, void 0, void 0, function* () {
-        const urlDadJoke = "https://icanhazdadjoke.com/";
+        //random 0 or 1
+        let sourceIdJoke = Math.round(Math.random());
+        let urlSource = "";
+        if (sourceIdJoke === 0) {
+            urlSource = "https://icanhazdadjoke.com/";
+        }
+        else if (sourceIdJoke === 1) {
+            urlSource = "https://api.chucknorris.io/jokes/random";
+        }
         const myHeaders = new Headers({
             "Accept": "application/json",
             "User-Agent": "My Library (https://github.com/Leptonita/sprint5)"
         });
-        yield fetch(urlDadJoke, {
+        yield fetch(urlSource, {
             method: 'GET',
             headers: myHeaders
         })
             .then(response => response.json())
             .then(json => {
+            //show mood buttons
             if (moodBtnsContainer != null) {
                 moodBtnsContainer.style.visibility = "visible";
             }
             const divJoke = document.querySelector("div .joke");
             if (divJoke !== null) {
-                let currentJoke = json.joke;
-                //let lastScoreJoke = moodScoreButton[moodScoreButton.length - 1];
+                let currentJoke = "";
+                if (sourceIdJoke === 0) {
+                    currentJoke = json.joke;
+                    //sourceIdJoke = 1;
+                }
+                else if (sourceIdJoke === 1) {
+                    currentJoke = json.value;
+                    //sourceIdJoke = 0;
+                }
                 let lastScoreJoke = moodScoreButton;
                 getMoodScore();
                 const d = new Date();
                 reportJokes.push({ joke: previousJoke, score: lastScoreJoke, date: d.toISOString() });
                 previousJoke = currentJoke;
                 console.log(reportJokes);
-                return divJoke.innerHTML = json.joke;
+                return divJoke.innerHTML = currentJoke;
             }
             else {
                 return alert("sorry, something went wrong! No joke, no fun");
