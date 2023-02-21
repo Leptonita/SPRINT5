@@ -97,9 +97,13 @@ async function getWeather(url: string) {
 
                     //now values of "estadoCielo" and "temperatura"
                     const skyDescriptionNow = skyThisHourArr[0].descripcion;
+                    const skyValueNow = skyThisHourArr[0].value;
+
                     const temperatureNow = tempThisHourArr[0].value;
-                    const messageWeather = `Hoy: cielo ${skyDescriptionNow.toLowerCase()} y ${temperatureNow} ºC`;
-                    console.log(messageWeather);
+
+                    const messageWeather = `Hoy: <img src="img/estado_cielo/${skyValueNow}.png" alt="cielo ${skyDescriptionNow.toLowerCase()}"> <strong> ${temperatureNow} ºC </strong>`;
+
+                    console.log(`Hoy: cielo ${skyDescriptionNow.toLowerCase()} (value: ${skyValueNow}) y ${temperatureNow} ºC`);
 
                     //show results on the HTML page
                     const meteoDiv = document.querySelector("#meteo");
@@ -134,8 +138,7 @@ let previousJoke: string = "";
 
 let moodScoreButton: string = "";
 
-
-
+let bg = 0;
 
 async function getJoke() {
 
@@ -186,10 +189,23 @@ async function getJoke() {
 
                 previousJoke = currentJoke;
 
+                //background change
+                let bgContainer: HTMLElement | null = document.querySelector(".container")
+                if (bgContainer !== null) {
+                    if (bg === 0) {
+                        bgContainer.style.backgroundImage = "url('img/blob-wine-3shapes.svg')";
+                        bg = 1;
+                    } else {
+                        bgContainer.style.backgroundImage = "url('img/blob-wine-3shapes-1.svg')";
+                        bg = 0;
+                    }
+                }
+
+
                 //show reportJokes
                 console.log(reportJokes);
                 //show joke
-                return divJoke.innerHTML = currentJoke;
+                return divJoke.innerHTML = `\"${currentJoke}\"`;
 
             } else {
                 return alert("sorry, something went wrong! No joke, no fun");
@@ -201,7 +217,7 @@ async function getJoke() {
 }
 
 
-
+//getting mood scores where 1=sad 2=normal 3=happy
 function getMoodScore() {
     moodScoreButton = "";
     moodButtons.forEach(button =>

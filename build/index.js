@@ -69,9 +69,10 @@ function getWeather(url) {
                 console.log(`datos para las ${nowHour} de hoy: ${toDayString} - Array: estado del Cielo - Temperatura`, skyThisHourArr, " - ", tempThisHourArr);
                 //now values of "estadoCielo" and "temperatura"
                 const skyDescriptionNow = skyThisHourArr[0].descripcion;
+                const skyValueNow = skyThisHourArr[0].value;
                 const temperatureNow = tempThisHourArr[0].value;
-                const messageWeather = `Hoy: cielo ${skyDescriptionNow.toLowerCase()} y ${temperatureNow} ºC`;
-                console.log(messageWeather);
+                const messageWeather = `Hoy: <img src="img/estado_cielo/${skyValueNow}.png" alt="cielo ${skyDescriptionNow.toLowerCase()}"> <strong> ${temperatureNow} ºC </strong>`;
+                console.log(`Hoy: cielo ${skyDescriptionNow.toLowerCase()} (value: ${skyValueNow}) y ${temperatureNow} ºC`);
                 //show results on the HTML page
                 const meteoDiv = document.querySelector("#meteo");
                 (meteoDiv !== null) ? meteoDiv.innerHTML = messageWeather : "sin previsión";
@@ -86,8 +87,10 @@ function getWeather(url) {
 const dirApi = getWeather(urlMeteoApi);
 console.log("direction datos meteo AEMET, getWeather(urlMeteoApi)", dirApi);
 //
-//JOKES 
+//JOKES
 // by icanhazdadjoke.com/
+// by https://api.chucknorris.io
+//mood icons visible only when clicking the button to begin
 const moodBtnsContainer = document.getElementById("moodBtnsContainer");
 if (moodBtnsContainer != null) {
     moodBtnsContainer.style.visibility = "hidden";
@@ -96,9 +99,10 @@ const reportJokes = [];
 const moodButtons = document.querySelectorAll('[data-score]');
 let previousJoke = "";
 let moodScoreButton = "";
+let bg = 0;
 function getJoke() {
     return __awaiter(this, void 0, void 0, function* () {
-        //random 0 or 1
+        //random 0 or 1 - to choose the API source of the jokes
         let sourceIdJoke = Math.round(Math.random());
         let urlSource = "";
         if (sourceIdJoke === 0) {
@@ -126,19 +130,31 @@ function getJoke() {
                 let currentJoke = "";
                 if (sourceIdJoke === 0) {
                     currentJoke = json.joke;
-                    //sourceIdJoke = 1;
                 }
                 else if (sourceIdJoke === 1) {
                     currentJoke = json.value;
-                    //sourceIdJoke = 0;
                 }
                 let lastScoreJoke = moodScoreButton;
                 getMoodScore();
                 const d = new Date();
                 reportJokes.push({ joke: previousJoke, score: lastScoreJoke, date: d.toISOString() });
                 previousJoke = currentJoke;
+                //background change
+                let bgContainer = document.querySelector(".container");
+                if (bgContainer !== null) {
+                    if (bg === 0) {
+                        bgContainer.style.backgroundImage = "url('img/blob-wine-3shapes.svg')";
+                        bg = 1;
+                    }
+                    else {
+                        bgContainer.style.backgroundImage = "url('img/blob-wine-3shapes-1.svg')";
+                        bg = 0;
+                    }
+                }
+                //show reportJokes
                 console.log(reportJokes);
-                return divJoke.innerHTML = currentJoke;
+                //show joke
+                return divJoke.innerHTML = `\"${currentJoke}\"`;
             }
             else {
                 return alert("sorry, something went wrong! No joke, no fun");
@@ -149,6 +165,7 @@ function getJoke() {
         });
     });
 }
+//getting mood scores where 1=sad 2=normal 3=happy
 function getMoodScore() {
     moodScoreButton = "";
     moodButtons.forEach(button => button.addEventListener('click', () => {

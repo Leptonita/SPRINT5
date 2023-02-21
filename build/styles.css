@@ -1,8 +1,79 @@
-/* * {
+/*  see boxes limits
+* {
     border: 1px solid greenyellow;
-} */
+}
+*/
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-size: 1rem;
+}
+
+.container {
+    width: 100%;
+    background-image: url("img/blob-wine-3shapes.svg");
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-position: 50% 0px;
+    height: 99vh;
+    /* <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><path fill="#BAE6FF" d="M37.6,-56.7C52.1,-49.3,69.3,-44.4,79.9,-33C90.5,-21.6,94.5,-3.7,92.4,13.5C90.2,30.7,81.9,47.3,69.3,57.8C56.7,68.2,39.6,72.7,24.3,72.4C9,72.1,-4.6,67.2,-20.4,64.7C-36.2,62.3,-54.1,62.3,-65.9,54.1C-77.8,45.9,-83.6,29.4,-86.5,12.1C-89.4,-5.1,-89.5,-23,-82.8,-37.9C-76.1,-52.8,-62.6,-64.7,-47.7,-71.8C-32.8,-79,-16.4,-81.4,-2.4,-77.7C11.6,-74,23.2,-64.1,37.6,-56.7Z" transform="translate(100 100)" /></svg> */
+}
 
 #jokeContent {
-    width: 80%;
+    width: 50%;
+    color: rgb(255, 255, 176);
     margin: auto;
+
+}
+
+.btn-joke {
+    background-image: url("img/btn-next-joke.png");
+    ;
+    background-repeat: no-repeat;
+    width: 114px;
+    height: 41px;
+    z-index: 99;
+    transition: all ease-in-out 0.3s;
+}
+
+.btn-joke:hover {
+    background-image: url("img/btn-next-joke-hover.png");
+    background-repeat: no-repeat;
+}
+
+.mood-icon {
+    opacity: 0.9;
+    transition: all ease-in-out 0.3s;
+}
+
+.mood-icon:hover {
+    opacity: 1;
+}
+
+@media all and (max-width: 767px) {
+    body {
+        background-color: #FF0066;
+    }
+
+    .weather {
+        background-color: #00bbff;
+    }
+
+    #jokeContent {
+        width: 90%;
+    }
+}
+
+@media all and (min-width: 768px) {
+    body {
+        background-color: white;
+    }
+
+    #jokeContent {
+        width: 50%;
+    }
 }

@@ -13,44 +13,43 @@
 
 <body>
 
-    <div class="container mt-5 p-3">
-
-        <div id="meteo" class="weather">
+    <div class="container">
+        <!-- METEO -->
+        <div id="meteo" class="weather mt-md-2 p-3">
             &nbsp;
         </div>
         <div class="row">
-            <div id="jokeContent" class="shadow-lg justify-content-center my-5">
+            <div id="jokeContent" class="justify-content-center">
+                <!-- JOKE TEXT -->
                 <div class="row ">
-                    <h5 class="text-center mt-5">Ready to laugh? </h5>
+                    <h5 class="text-center mt-5 text-light">Ready to laugh? </h5>
                     <div class="joke text-center justify-content-center my-5 px-5">
 
                     </div>
                 </div>
-                <div class="row">
-                    <div class="d-flex justify-content-center my-5">
-                        <button type="button" class="btn btn-info justify-content-center shadow-sm"
-                            onclick="getJoke()">Next
-                            joke</button>
-                    </div>
-                </div>
-                <div id="moodBtnsContainer" class="row" visibility="hidden">
-                    <div class="d-flex justify-content-center my-5">
+                <!-- MOOD BUTTONS -->
+                <div id="moodBtnsContainer" class="row" style="visibility: hidden;">
+                    <div class="d-flex justify-content-center my-2">
                         <button id="sadMood" data-score="1" type="button"
-                            class="btn btn-danger justify-content-center me-2">sad</button>
+                            class="btn justify-content-center me-2 rounded-circle"><img src="img/1-sad.png"
+                                alt="sad - 1" width="50px" height="50px" class="mood-icon"></button>
                         <button id="normalMood" data-score="2" type="button"
-                            class="btn btn-warning justify-content-center me-2">normal</button>
+                            class="btn justify-content-center me-2 rounded-circle"><img src="img/2-normal.png"
+                                alt="normal - 2" width="50px" height="50px" class="mood-icon"></button>
                         <button id="happyMood" data-score="3" type="button"
-                            class="btn btn-success justify-content-center">happy</button>
+                            class="btn justify-content-center rounded-circle"><img src="img/3-happy.png" width="50px"
+                                height="50px" alt="happy - 3" class="mood-icon"></button>
                     </div>
                 </div>
-
+                <!-- BUTTON NEXT JOKE   btn-info btn-sm rounded-5  shadow-sm"-->
+                <div class="row">
+                    <div class="d-flex justify-content-center my-4">
+                        <button type="button" class="btn btn-joke justify-content-center" onclick="getJoke()"></button>
+                    </div>
+                </div>
 
             </div>
-
         </div>
-
-
-
     </div>
 
     <script src="index.js"></script>
