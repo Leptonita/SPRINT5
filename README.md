@@ -12,4 +12,4 @@ ex 5 - adding Chuck Norris jokes from API (https://api.chucknorris.io/). Showing
 
 ex 6 - Web layout using svg decorative svg elements from https://www.blobmaker.app/
 
-the web page is available at: https://github.com/Leptonita/SPRINT5/tree/main/build
+:::::: The web page is available at: https://github.com/Leptonita/SPRINT5/tree/main/build
