@@ -11,3 +11,5 @@ ex 4 - weather information from  the API of AEMET
 ex 5 - adding Chuck Norris jokes from API (https://api.chucknorris.io/). Showing the two king of jokes randomly.
 
 ex 6 - Web layout using svg decorative svg elements from https://www.blobmaker.app/
+
+the web page is available at: https://github.com/Leptonita/SPRINT5/tree/main/build
