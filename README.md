@@ -1,5 +1,7 @@
 ## SPRINT 5 TypeScript and API Rest
 
+Joke in action at: https://beamish-fox-e66a32.netlify.app/
+
 ex 1 - getting a random dad joke from an API (info: https://icanhazdadjoke.com/api)
 
 ex 2 - showing elements - preliminary web layout (bootstrap)
